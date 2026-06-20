@@ -3,132 +3,91 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>4비트 컴퓨터 시뮬레이터</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f4f6fb;color:#111827;font-family:system-ui,-apple-system,Segoe UI,sans-serif}header{background:#111827;color:white;padding:18px 22px}h1{margin:0 0 6px;font-size:24px}header p{margin:0;color:#d1d5db}.layout{display:grid;grid-template-columns:360px minmax(820px,1fr);gap:16px;padding:16px}.card{background:white;border:1px solid #d0d5dd;border-radius:14px;padding:14px;box-shadow:0 6px 18px #10182812;margin-bottom:12px}h2{font-size:17px;margin:0 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}button,select,input{border:1px solid #98a2b3;border-radius:9px;background:white;padding:9px;font-weight:750}button{cursor:pointer}button.dark{background:#111827;color:white;width:100%}label{font-size:13px;font-weight:800;display:grid;gap:5px}.summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.summary div{background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:8px}.summary span{display:block;color:#9a3412;font-size:12px;font-weight:850}.summary b,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.phase{padding:9px;border:1px solid #d0d5dd;border-radius:9px;background:#f9fafb;margin-bottom:7px;font-weight:850}.phase.on{background:#fff7ed;border-color:#f59e0b;color:#9a3412}.explain{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:10px;padding:10px;line-height:1.45}.regs div{display:flex;justify-content:space-between;border-bottom:1px solid #eef2f7;padding:4px 0}.stageHead{display:flex;justify-content:space-between;gap:12px;align-items:center}.badge{background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:10px;font-weight:900}.svgwrap{overflow:auto;background:white;border-radius:14px;border:1px solid #d0d5dd}.node rect,.node path{fill:#fff;stroke:#111827;stroke-width:2}.node text{font-weight:900;font-size:15px}.node .s{font-size:11px;fill:#344054;font-weight:800}.node:hover rect,.node:hover path,.active rect,.active path{stroke:#2563eb;stroke-width:3}.pc rect{fill:#ecfdf3}.ram rect{fill:#fff7ed}.ir rect{fill:#eef4ff}.cu rect{fill:#fff9db}.io rect{fill:#fef3c7}.reg rect{fill:#eff6ff}.alu path{fill:#fff7ed;stroke:#ea580c}.acc rect{fill:#fff1f2}.out rect{fill:#fef9c3}.led rect{fill:#fff1f2}.wire{fill:none;stroke-linecap:round;stroke-linejoin:round}.addr{stroke:#1e5bff;stroke-width:4.5}.data{stroke:#11883a;stroke-width:4.5}.ctrl{stroke:#ff7a00;stroke-width:2.2;stroke-dasharray:7 5}.thin{stroke-width:3}.bits rect{fill:white;stroke:#344054;stroke-width:1}.bits line{stroke:#344054}.bits text{font:900 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-anchor:middle}.leds circle{fill:#fecaca;stroke:#991b1b;stroke-width:2}.leds circle.on{fill:#ef4444}.inled circle{fill:#e5e7eb;stroke:#111827}.inled circle.on{fill:#22c55e}.packet circle{stroke:white;stroke-width:2}.packet text{fill:white;font-size:10px;font-weight:900;text-anchor:middle;dominant-baseline:middle}.mem table{width:100%;border-collapse:collapse;font-size:12px}.mem th,.mem td{border-bottom:1px solid #fef3c7;text-align:left;padding:4px}.mem td:nth-child(1),.mem td:nth-child(3){font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:800}.log{max-height:210px;overflow:auto;margin:0;padding-left:22px}.micro{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.micro .m{border:1px solid #d0d5dd;border-radius:12px;padding:10px;background:#fff}.micro h3{margin:0 0 6px;font-size:14px}.micro p{margin:0;color:#475467;line-height:1.35;font-size:12px}.micro .hot{background:#fff7ed;border-color:#f59e0b}.tip{position:fixed;z-index:9;max-width:310px;background:#111827;color:white;border-radius:10px;padding:10px;box-shadow:0 8px 24px #10182840;font-size:13px;line-height:1.45;pointer-events:none}.isa{width:100%;border-collapse:collapse;font-size:12px}.isa td,.isa th{padding:5px;border-bottom:1px solid #eef2f7;text-align:left}@media(max-width:1120px){.layout{grid-template-columns:1fr}.micro{grid-template-columns:1fr}.stageHead{display:block}.badge{margin-top:10px}.summary{grid-template-columns:1fr}}
-</style>
+<title>4-bit Datapath Simulator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header><h1>4비트 컴퓨터 시뮬레이터</h1><p>입력값이 RAM, IR, 제어장치, 레지스터, ALU, ACC를 거쳐 출력되는 과정을 단계별로 봅니다.</p></header>
+<header>
+<h1>4-bit Datapath Simulator</h1>
+<p>PC, RAM, IR, control unit, register latch, ALU bit-slice, accumulator, output latch의 상태 전이를 추적합니다.</p>
+</header>
 <main class="layout">
 <aside>
 <section class="card">
-<h2>실제로 해 볼 일</h2>
-<label>할 일 선택<select id="task"></select></label>
+<h2>실행할 작업</h2>
+<label>작업 선택<select id="task"></select></label>
 <div class="grid" style="margin-top:8px">
 <label>입력 A<input id="ain" type="number" min="0" max="15"></label>
-<label>입력 B / 기준값<input id="bin" type="number" min="0" max="15"></label>
+<label>입력 B / immediate<input id="bin" type="number" min="0" max="15"></label>
 </div>
-<button class="dark" id="prep" style="margin-top:8px">이 작업 준비</button>
-<div class="summary"><div><span>입력 A</span><b id="sa">-</b></div><div><span>입력 B/기준</span><b id="sb">-</b></div><div><span>예상 출력</span><b id="se">-</b></div><div><span>실제 출력</span><b id="so">아직 실행 전</b></div></div>
-<p class="explain" id="taskInfo" style="margin-top:10px">작업을 고른 뒤 준비하십시오.</p>
-<div class="mem"><h2 style="font-size:14px;margin-top:10px">메모리 세팅</h2><div id="memset">아직 준비되지 않았습니다.</div></div>
+<button class="dark" id="load" style="margin-top:8px">메모리 로드</button>
+<div class="summary" id="sum"></div>
 </section>
-<section class="card"><h2>실행 제어</h2><div class="grid"><button id="step">1단계 실행</button><button id="run">자동 실행</button><button id="reset">리셋</button><button id="basic">기본 계산</button></div><label style="margin-top:8px">속도<input id="speed" type="range" min="0.6" max="2.4" step="0.1" value="1.2"></label></section>
-<section class="card"><h2>지금 무엇을 하는가</h2><div id="phases"><div class="phase on">1 Fetch</div><div class="phase">2 Decode</div><div class="phase">3 Execute</div><div class="phase">4 Write-back</div></div><p class="explain" id="explain">PC가 가리키는 주소에서 명령을 읽습니다.</p></section>
-<section class="card"><h2>현재 값</h2><div class="regs mono" id="regs"></div></section>
-<section class="card"><h2>명령어</h2><table class="isa"><tr><th>코드</th><th>명령</th><th>의미</th></tr><tr><td>0001</td><td>LDA</td><td>입력 A 저장</td></tr><tr><td>0010</td><td>LDB</td><td>입력 B 저장</td></tr><tr><td>0011</td><td>ADD</td><td>더하기</td></tr><tr><td>0100</td><td>SUB</td><td>빼기</td></tr><tr><td>1000</td><td>MUL</td><td>곱하기</td></tr><tr><td>1001</td><td>DIV</td><td>나누기</td></tr><tr><td>1010</td><td>CALC</td><td>선택 작업</td></tr><tr><td>0111</td><td>OUT</td><td>출력</td></tr><tr><td>1111</td><td>HLT</td><td>정지</td></tr></table></section>
+<section class="card">
+<h2>실행 제어</h2>
+<div class="grid">
+<button id="step">1 cycle</button>
+<button id="run">run</button>
+<button id="reset">reset</button>
+</div>
+</section>
+<section class="card">
+<h2>Cycle</h2>
+<div class="phase" id="phase">T0 Fetch</div>
+<p class="explain">T0 fetch, T1 decode, T2 execute, T3 write-back으로 단순화한 datapath 모델입니다.</p>
+</section>
+<section class="card">
+<h2>Architectural state</h2>
+<div class="regs mono">
+<div><span>PC</span><b id="r_pc">0000</b></div>
+<div><span>IR</span><b id="r_ir">0000</b></div>
+<div><span>A</span><b id="r_a">0000</b></div>
+<div><span>B</span><b id="r_b">0000</b></div>
+<div><span>ACC</span><b id="r_acc">0000</b></div>
+<div><span>OUT</span><b id="r_out">0000</b></div>
+<div><span>IN</span><b id="r_input">0000</b></div>
+</div>
+</section>
+<section class="card">
+<h2>메모리 이미지</h2>
+<div id="mem"></div>
+</section>
 </aside>
 <section>
 <section class="card">
-<div class="stageHead"><div><h2>회로 동작</h2><p style="margin:0;color:#667085">단계별로 값과 신호를 확인합니다.</p></div><div class="badge" id="ib">현재 명령: 0000 NOP</div></div>
-<div class="svgwrap" style="margin-top:12px">
-<svg id="svg" width="1180" height="720" viewBox="0 0 1180 720">
-<defs><marker id="ab" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,3.5 L0,7Z" fill="#1e5bff"/></marker><marker id="ag" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,3.5 L0,7Z" fill="#11883a"/></marker><marker id="ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L7,3 L0,6Z" fill="#ff7a00"/></marker></defs>
-<rect width="1180" height="720" rx="14" fill="white"/><text x="590" y="34" text-anchor="middle" style="font-weight:900;font-size:24px">4비트 컴퓨터 회로도</text>
-<g id="pcN" class="node pc"><rect x="70" y="70" width="185" height="112" rx="8"/><text x="162" y="102" text-anchor="middle">PC</text><text id="pcState" x="162" y="126" text-anchor="middle" class="s">주소=0000</text><g class="bits" transform="translate(82 146)"><rect width="160" height="22"/><line x1="40" y1="0" x2="40" y2="22"/><line x1="80" y1="0" x2="80" y2="22"/><line x1="120" y1="0" x2="120" y2="22"/><text id="pc3" x="20" y="16">0</text><text id="pc2" x="60" y="16">0</text><text id="pc1" x="100" y="16">0</text><text id="pc0" x="140" y="16">0</text></g></g>
-<g id="ramN" class="node ram"><rect x="760" y="70" width="280" height="142" rx="8"/><text x="900" y="102" text-anchor="middle">RAM</text><text id="ramState" x="900" y="127" text-anchor="middle" class="s">선택 주소: 0x0</text><text id="ramWord" x="900" y="152" text-anchor="middle" class="s">읽은 명령: LDA / 0001</text><text x="900" y="184" text-anchor="middle" class="s">READ 신호가 켜지면 IR로 전송</text></g>
-<g id="irN" class="node ir"><rect x="330" y="245" width="230" height="128" rx="8"/><text x="445" y="276" text-anchor="middle">IR</text><text id="irState" x="445" y="300" text-anchor="middle" class="s">명령 래치: 0000</text><text id="irDecode" x="445" y="323" text-anchor="middle" class="s">opcode = NOP</text><g class="bits" transform="translate(365 340)"><rect width="160" height="22"/><line x1="40" y1="0" x2="40" y2="22"/><line x1="80" y1="0" x2="80" y2="22"/><line x1="120" y1="0" x2="120" y2="22"/><text id="ir3" x="20" y="16">0</text><text id="ir2" x="60" y="16">0</text><text id="ir1" x="100" y="16">0</text><text id="ir0" x="140" y="16">0</text></g></g>
-<g id="cuN" class="node cu"><rect x="720" y="260" width="325" height="132" rx="8"/><text x="882" y="292" text-anchor="middle">제어장치</text><text id="cuState" x="882" y="316" text-anchor="middle" class="s">신호: 대기</text><rect x="755" y="336" width="110" height="34" rx="5" fill="#fff"/><rect x="900" y="336" width="110" height="34" rx="5" fill="#fff"/><text id="decText" x="810" y="357" text-anchor="middle" class="s">decoder</text><text id="seqText" x="955" y="357" text-anchor="middle" class="s">T0</text></g>
-<g id="inputN" class="node io"><rect x="70" y="410" width="185" height="108" rx="8"/><text x="162" y="442" text-anchor="middle">입력 포트</text><text id="inState" x="162" y="466" text-anchor="middle" class="s">입력=0000</text><g class="inled" transform="translate(120 492)"><circle id="in3" cx="0" cy="0" r="7"/><circle id="in2" cx="28" cy="0" r="7"/><circle id="in1" cx="56" cy="0" r="7"/><circle id="in0" cx="84" cy="0" r="7"/></g></g>
-<g id="aN" class="node reg"><rect x="330" y="430" width="190" height="108" rx="8"/><text x="425" y="462" text-anchor="middle">레지스터 A</text><text id="aState" x="425" y="486" text-anchor="middle" class="s">저장값=0000</text><g class="bits" transform="translate(345 504)"><rect width="160" height="22"/><line x1="40" y1="0" x2="40" y2="22"/><line x1="80" y1="0" x2="80" y2="22"/><line x1="120" y1="0" x2="120" y2="22"/><text id="a3" x="20" y="16">0</text><text id="a2" x="60" y="16">0</text><text id="a1" x="100" y="16">0</text><text id="a0" x="140" y="16">0</text></g></g>
-<g id="bN" class="node reg"><rect x="330" y="565" width="190" height="108" rx="8"/><text x="425" y="597" text-anchor="middle">레지스터 B</text><text id="bState" x="425" y="621" text-anchor="middle" class="s">저장값=0000</text><g class="bits" transform="translate(345 639)"><rect width="160" height="22"/><line x1="40" y1="0" x2="40" y2="22"/><line x1="80" y1="0" x2="80" y2="22"/><line x1="120" y1="0" x2="120" y2="22"/><text id="b3" x="20" y="16">0</text><text id="b2" x="60" y="16">0</text><text id="b1" x="100" y="16">0</text><text id="b0" x="140" y="16">0</text></g></g>
-<g id="aluN" class="node alu"><path d="M660 452 H960 L915 585 H705 Z"/><text x="810" y="490" text-anchor="middle">ALU</text><text id="aluOp" x="810" y="516" text-anchor="middle" class="s">op = 대기</text><text id="aluArgs" x="810" y="540" text-anchor="middle" class="s">A=0000, B=0000</text><text id="aluRes" x="810" y="564" text-anchor="middle" class="s">결과=----</text></g>
-<g id="accN" class="node acc"><rect x="690" y="620" width="220" height="82" rx="8"/><text x="800" y="650" text-anchor="middle">ACC</text><text id="accState" x="800" y="675" text-anchor="middle" class="s">ALU 결과 래치=0000</text><g class="bits" transform="translate(720 683)"><rect width="160" height="18"/><line x1="40" y1="0" x2="40" y2="18"/><line x1="80" y1="0" x2="80" y2="18"/><line x1="120" y1="0" x2="120" y2="18"/><text id="acc3" x="20" y="14">0</text><text id="acc2" x="60" y="14">0</text><text id="acc1" x="100" y="14">0</text><text id="acc0" x="140" y="14">0</text></g></g>
-<g id="outN" class="node out"><rect x="960" y="600" width="170" height="82" rx="8"/><text x="1045" y="630" text-anchor="middle">OUT</text><text id="outState" x="1045" y="654" text-anchor="middle" class="s">출력 래치=0000</text></g>
-<g id="ledN" class="node led"><rect x="960" y="470" width="170" height="86" rx="8"/><text x="1045" y="500" text-anchor="middle">LED</text><text x="1045" y="522" text-anchor="middle" class="s">4비트 출력</text><g class="leds" transform="translate(997 540)"><circle id="led3" cx="0" cy="0" r="10"/><circle id="led2" cx="32" cy="0" r="10"/><circle id="led1" cx="64" cy="0" r="10"/><circle id="led0" cx="96" cy="0" r="10"/></g></g>
-<path id="pAddr" class="wire addr" d="M255 96 H720 V120 H760" marker-end="url(#ab)"/>
-<path id="pRamIr" class="wire data thin" d="M760 205 H600 V285 H560" marker-end="url(#ag)"/>
-<path id="pIrCu" class="wire ctrl" d="M560 318 H720" marker-end="url(#ao)"/>
-<path id="pInA" class="wire data thin" d="M255 456 H330" marker-end="url(#ag)"/>
-<path id="pInB" class="wire data thin" d="M255 495 H300 V620 H330" marker-end="url(#ag)"/>
-<path id="pAAlu" class="wire data thin" d="M520 485 H640 V492 H660" marker-end="url(#ag)"/>
-<path id="pBAlu" class="wire data thin" d="M520 620 H610 V552 H670" marker-end="url(#ag)"/>
-<path id="pCuAlu" class="wire ctrl" d="M882 392 V430 H820 V452" marker-end="url(#ao)"/>
-<path id="pAluAcc" class="wire data thin" d="M805 585 V620" marker-end="url(#ag)"/>
-<path id="pAccOut" class="wire data thin" d="M910 663 H960" marker-end="url(#ag)"/>
-<path id="pOutLed" class="wire data thin" d="M1045 600 V556" marker-end="url(#ag)"/>
-<g id="packets"></g>
-</svg></div></section>
-<section class="card"><h2>부품 내부에서 일어나는 일</h2><div class="micro" id="micro"></div></section>
-<section class="card"><h2>실행 로그</h2><ol class="log" id="log"></ol></section>
+<h2>Datapath overview</h2>
+<div class="flow">
+<div class="unit"><h3>PC</h3><p id="pcbox">PC=0000</p></div>
+<div class="arrow">→</div>
+<div class="unit"><h3>RAM / IR</h3><p id="ir">IR=0000 NOP</p></div>
+<div class="arrow">→</div>
+<div class="unit"><h3>Control</h3><p id="ctrl">control=MEM_READ</p></div>
+<div class="unit"><h3>Input</h3><p>A와 B 값이 순서대로 input bus에 올라갑니다.</p></div>
+<div class="arrow">→</div>
+<div class="unit"><h3>Register file</h3><p>A/B register가 load enable에 따라 값을 latch합니다.</p></div>
+<div class="arrow">→</div>
+<div class="unit"><h3>ALU</h3><p>4개의 bit-slice가 병렬로 결과 비트를 만듭니다.</p></div>
+<div class="unit"><h3>ACC</h3><p>ALU 결과를 write-back 단계에서 latch합니다.</p></div>
+<div class="arrow">→</div>
+<div class="unit"><h3>OUT</h3><p>출력 latch</p></div>
+<div class="arrow">→</div>
+<div class="unit"><h3>LED</h3><p id="leds"></p></div>
+</div>
+</section>
+<section class="card">
+<h2>Register latch view</h2>
+<div class="detailgrid" id="regdetail"></div>
+</section>
+<section class="card">
+<h2>ALU bit-slice view</h2>
+<div class="box" id="aludetail"></div>
+</section>
+<section class="card">
+<h2>Trace</h2>
+<ol class="log" id="log"></ol>
+</section>
 </section>
 </main>
-<div id="tip" class="tip" hidden></div>
-<script>
-const TASKS = [{"title":"두 수 더하기","kind":"ADD","a":3,"b":5,"desc":"A+B를 계산합니다."},{"title":"두 수 빼기","kind":"SUB","a":9,"b":4,"desc":"A-B를 계산합니다."},{"title":"두 수 곱하기","kind":"MUL","a":3,"b":4,"desc":"A×B를 계산합니다."},{"title":"두 수 나누기의 몫 구하기","kind":"DIV","a":13,"b":3,"desc":"A÷B의 몫을 계산합니다."},{"title":"두 수 나누기의 나머지 구하기","kind":"MOD","a":13,"b":3,"desc":"A÷B의 나머지를 계산합니다."},{"title":"1 증가시키기","kind":"INC","a":7,"b":1,"desc":"A에 1을 더합니다."},{"title":"1 감소시키기","kind":"DEC","a":7,"b":1,"desc":"A에서 1을 뺍니다."},{"title":"두 배 만들기","kind":"DOUBLE","a":6,"b":2,"desc":"A를 두 배로 만듭니다."},{"title":"절반 만들기","kind":"HALF","a":9,"b":2,"desc":"A를 2로 나눕니다."},{"title":"세 수의 합을 순서대로 누적하기","kind":"SUM3","a":3,"b":4,"desc":"A+B+3을 계산합니다."},{"title":"여러 수의 누적합 만들기","kind":"RUNSUM","a":4,"b":6,"desc":"A부터 B까지 더합니다."},{"title":"차이를 절댓값처럼 보기","kind":"ABS","a":4,"b":11,"desc":"두 수 차이를 양수로 봅니다."},{"title":"큰 수에서 작은 수 빼기","kind":"BIGSUB","a":4,"b":11,"desc":"큰 값에서 작은 값을 뺍니다."},{"title":"작은 수에서 큰 수를 뺐을 때 4비트 순환 보기","kind":"SMALLSUB","a":4,"b":11,"desc":"음수 결과가 4비트로 어떻게 보이는지 봅니다."},{"title":"결과가 15를 넘을 때 아래 4비트만 남는 현상 보기","kind":"ADD","a":12,"b":9,"desc":"오버플로를 봅니다."},{"title":"0을 더했을 때 변화 없음 확인","kind":"ADD","a":8,"b":0,"desc":"A+0입니다."},{"title":"0을 곱했을 때 0이 되는 과정 보기","kind":"MUL","a":8,"b":0,"desc":"A×0입니다."},{"title":"1을 곱했을 때 그대로 남는 과정 보기","kind":"MUL","a":8,"b":1,"desc":"A×1입니다."},{"title":"같은 수를 여러 번 더해 곱셈처럼 보기","kind":"MUL","a":5,"b":3,"desc":"반복 덧셈 관점의 곱셈입니다."},{"title":"반복 덧셈으로 곱셈 설명하기","kind":"MUL","a":4,"b":3,"desc":"곱셈을 반복 덧셈으로 설명합니다."},{"title":"반복 뺄셈으로 나눗셈 설명하기","kind":"DIV","a":14,"b":4,"desc":"나눗셈을 반복 뺄셈으로 설명합니다."},{"title":"몫과 나머지 분리하기","kind":"DIV","a":14,"b":4,"desc":"몫은 출력하고 나머지는 설명합니다."},{"title":"짝수인지 홀수인지 마지막 비트로 확인하기","kind":"ODD","a":9,"b":1,"desc":"마지막 비트가 1이면 홀수입니다."},{"title":"2의 배수 판정하기","kind":"MULT2","a":10,"b":2,"desc":"2의 배수이면 1입니다."},{"title":"4의 배수 판정하기","kind":"MULT4","a":12,"b":4,"desc":"4의 배수이면 1입니다."},{"title":"두 수가 같은지 비교하기","kind":"EQ","a":7,"b":7,"desc":"같으면 1입니다."},{"title":"A가 B보다 큰지 비교하기","kind":"GT","a":9,"b":4,"desc":"A>B이면 1입니다."},{"title":"A가 B보다 작은지 비교하기","kind":"LT","a":4,"b":9,"desc":"A<B이면 1입니다."},{"title":"두 값 중 큰 값 고르기","kind":"MAX","a":4,"b":9,"desc":"큰 값을 출력합니다."},{"title":"두 값 중 작은 값 고르기","kind":"MIN","a":4,"b":9,"desc":"작은 값을 출력합니다."},{"title":"최댓값을 계속 갱신하기","kind":"MAX","a":6,"b":11,"desc":"더 큰 값으로 갱신합니다."},{"title":"최솟값을 계속 갱신하기","kind":"MIN","a":6,"b":2,"desc":"더 작은 값으로 갱신합니다."},{"title":"기준값 이상인지 판단하기","kind":"GE","a":8,"b":5,"desc":"A가 B 이상이면 1입니다."},{"title":"기준값 미만인지 판단하기","kind":"LT","a":3,"b":5,"desc":"A가 B 미만이면 1입니다."},{"title":"범위 안에 있는 값인지 확인하기","kind":"RANGE","a":7,"b":10,"desc":"A가 0 이상 B 이하인지 봅니다."},{"title":"참/거짓 값을 0과 1로 표현하기","kind":"GE","a":8,"b":5,"desc":"참은 1, 거짓은 0입니다."},{"title":"조건을 만족하면 LED 켜기","kind":"LEDTRUE","a":8,"b":5,"desc":"조건이 참이면 1111입니다."},{"title":"조건을 만족하지 않으면 LED 끄기","kind":"LEDFALSE","a":3,"b":5,"desc":"조건이 거짓이면 1111입니다."},{"title":"비밀번호 한 자리 맞히기","kind":"EQ","a":7,"b":7,"desc":"입력과 비밀번호가 같으면 1입니다."},{"title":"스위치 입력이 특정 패턴인지 검사하기","kind":"EQ","a":10,"b":10,"desc":"4비트 패턴 일치를 검사합니다."},{"title":"10진수를 2진수 4비트로 바꾸기","kind":"PASS","a":13,"b":0,"desc":"A를 4비트로 출력합니다."},{"title":"2진수 4비트를 10진수로 읽기","kind":"PASS","a":11,"b":0,"desc":"4비트 값을 10진수로 읽습니다."},{"title":"상위 비트와 하위 비트 구분하기","kind":"HIGHLOW","a":11,"b":0,"desc":"상위 2비트와 하위 2비트를 봅니다."},{"title":"일의 자리만 남기기","kind":"ONES","a":13,"b":10,"desc":"A의 일의 자리를 출력합니다."},{"title":"16을 넘는 값을 4비트로 잘라 보기","kind":"ADD","a":15,"b":9,"desc":"아래 4비트만 남습니다."},{"title":"올림이 생기는 덧셈 보기","kind":"ADD","a":9,"b":8,"desc":"자리올림을 봅니다."},{"title":"자리올림 플래그 개념 보기","kind":"CARRY","a":9,"b":8,"desc":"자리올림이면 1입니다."},{"title":"자리내림이 필요한 뺄셈 보기","kind":"BORROW","a":4,"b":9,"desc":"자리내림이면 1입니다."},{"title":"버림 계산 보기","kind":"DIV","a":14,"b":4,"desc":"몫만 남깁니다."},{"title":"반올림을 위해 기준값을 더한 뒤 나누기","kind":"ROUND","a":13,"b":4,"desc":"B 단위로 반올림합니다."},{"title":"소수 첫째 자리 반올림을 정수 연산으로 흉내 내기","kind":"ROUND10","a":14,"b":10,"desc":"정수 연산으로 반올림을 흉내 냅니다."},{"title":"10의 자리와 1의 자리 분리하기","kind":"TENS","a":14,"b":10,"desc":"10의 자리와 1의 자리를 분리합니다."},{"title":"두 자리 수를 자리값으로 조립하기","kind":"COMPOSE","a":1,"b":4,"desc":"10×A+B를 만듭니다."},{"title":"BCD처럼 한 자리 숫자를 따로 저장하기","kind":"PASS","a":9,"b":0,"desc":"한 자리 숫자를 4비트로 저장합니다."},{"title":"시계처럼 0부터 15까지 순환 세기","kind":"INC","a":15,"b":1,"desc":"15 다음 0으로 돌아갑니다."},{"title":"0부터 15까지 카운트하기","kind":"INC","a":0,"b":1,"desc":"1씩 증가합니다."},{"title":"15부터 0까지 거꾸로 세기","kind":"DEC","a":15,"b":1,"desc":"1씩 감소합니다."},{"title":"짝수만 세기","kind":"EVENNEXT","a":6,"b":2,"desc":"다음 짝수를 출력합니다."},{"title":"홀수만 세기","kind":"ODDNEXT","a":7,"b":2,"desc":"다음 홀수를 출력합니다."},{"title":"정해진 횟수만큼 반복하기","kind":"PASS","a":5,"b":0,"desc":"반복 횟수를 표시합니다."},{"title":"타이머처럼 일정 단계 뒤 출력하기","kind":"PASS","a":4,"b":0,"desc":"단계 수를 표시합니다."},{"title":"버튼을 누른 횟수 세기","kind":"INC","a":6,"b":1,"desc":"횟수에 1을 더합니다."},{"title":"LED를 순서대로 켜기","kind":"LEDSEQ","a":2,"b":0,"desc":"한 LED만 켭니다."},{"title":"LED를 왼쪽으로 이동시키기","kind":"SHL","a":3,"b":1,"desc":"비트를 왼쪽으로 이동합니다."},{"title":"LED를 오른쪽으로 이동시키기","kind":"SHR","a":12,"b":1,"desc":"비트를 오른쪽으로 이동합니다."},{"title":"비트를 왼쪽으로 밀어 2배처럼 만들기","kind":"SHL","a":6,"b":1,"desc":"왼쪽 이동으로 두 배를 봅니다."},{"title":"비트를 오른쪽으로 밀어 2로 나눈 몫처럼 만들기","kind":"SHR","a":9,"b":1,"desc":"오른쪽 이동으로 절반을 봅니다."},{"title":"AND로 필요한 비트만 남기기","kind":"AND","a":13,"b":3,"desc":"A AND B입니다."},{"title":"OR로 특정 비트 켜기","kind":"OR","a":8,"b":2,"desc":"A OR B입니다."},{"title":"XOR로 두 입력이 다른지 확인하기","kind":"XOR","a":10,"b":12,"desc":"A XOR B입니다."},{"title":"NOT으로 비트 뒤집기","kind":"NOT","a":10,"b":0,"desc":"A의 비트를 뒤집습니다."},{"title":"마스크를 이용해 하위 2비트만 읽기","kind":"LOW2","a":13,"b":3,"desc":"하위 2비트만 남깁니다."},{"title":"상위 2비트만 읽기","kind":"HIGH2","a":13,"b":12,"desc":"상위 2비트만 남깁니다."},{"title":"입력 패턴을 LED 패턴으로 복사하기","kind":"PASS","a":10,"b":0,"desc":"입력을 그대로 출력합니다."},{"title":"두 스위치가 모두 켜졌는지 확인하기","kind":"BOTH","a":3,"b":0,"desc":"하위 두 비트가 모두 1인지 봅니다."},{"title":"두 스위치 중 하나라도 켜졌는지 확인하기","kind":"ANY","a":2,"b":0,"desc":"하나라도 켜졌는지 봅니다."},{"title":"정확히 하나만 켜졌는지 확인하기","kind":"ONE","a":2,"b":0,"desc":"정확히 하나만 1인지 봅니다."},{"title":"네 스위치 중 켜진 개수 세기","kind":"POPC","a":11,"b":0,"desc":"1의 개수를 셉니다."},{"title":"간단한 점수판 만들기","kind":"ADD","a":6,"b":2,"desc":"점수에 득점을 더합니다."},{"title":"게임 체력값을 더하고 빼기","kind":"SUB","a":10,"b":3,"desc":"체력에서 피해량을 뺍니다."},{"title":"물건 개수 늘리고 줄이기","kind":"ADD","a":7,"b":4,"desc":"물건 개수를 더합니다."},{"title":"잔돈 계산 흉내 내기","kind":"SUB","a":15,"b":9,"desc":"낸 돈에서 가격을 뺍니다."},{"title":"남은 횟수 표시하기","kind":"SUB","a":10,"b":3,"desc":"전체에서 사용 횟수를 뺍니다."},{"title":"출석 인원 수 누적하기","kind":"INC","a":12,"b":1,"desc":"한 명을 추가합니다."},{"title":"퀴즈 정답 수 세기","kind":"INC","a":5,"b":1,"desc":"정답 수를 하나 늘립니다."},{"title":"온도값이 기준보다 높은지 판단하기","kind":"GT","a":9,"b":7,"desc":"온도가 기준보다 높으면 1입니다."},{"title":"밝기 센서값을 4단계로 분류하기","kind":"LV4","a":11,"b":0,"desc":"0~15를 0~3 단계로 줄입니다."},{"title":"거리값을 가까움/보통/멀음으로 분류하기","kind":"LV3","a":9,"b":0,"desc":"거리값을 3단계로 분류합니다."},{"title":"작은 난수처럼 카운터 값을 사용하기","kind":"RAND","a":7,"b":0,"desc":"간단한 의사난수입니다."},{"title":"주사위 값 1~6 만들기","kind":"DICE","a":9,"b":0,"desc":"1~6으로 바꿉니다."},{"title":"가위바위보 상태를 숫자로 표현하기","kind":"MOD3","a":5,"b":0,"desc":"0,1,2 상태로 바꿉니다."},{"title":"간단한 잠금장치 만들기","kind":"EQ","a":9,"b":9,"desc":"입력이 열쇠값과 같으면 1입니다."},{"title":"신호등 상태를 숫자로 바꾸기","kind":"MOD3","a":2,"b":0,"desc":"0,1,2 상태로 표현합니다."},{"title":"엘리베이터 층 번호 표시하기","kind":"PASS","a":6,"b":0,"desc":"층 번호를 출력합니다."},{"title":"순서도 알고리즘을 명령어 흐름으로 바꾸기","kind":"ADD","a":3,"b":5,"desc":"입력-처리-출력 흐름을 봅니다."},{"title":"명령어 하나가 여러 단계로 나뉘는 과정 보기","kind":"ADD","a":3,"b":5,"desc":"Fetch, Decode, Execute, Write-back을 봅니다."},{"title":"메모리 주소가 바뀌면 다른 명령을 읽는 과정 보기","kind":"INC","a":2,"b":1,"desc":"PC 증가를 봅니다."},{"title":"입력값이 같아도 명령이 다르면 결과가 달라짐 보기","kind":"SUB","a":6,"b":3,"desc":"연산 종류에 따라 결과가 달라집니다."},{"title":"데이터와 명령이 모두 비트라는 점 보기","kind":"PASS","a":10,"b":0,"desc":"입력과 명령이 모두 비트임을 봅니다."},{"title":"작은 규칙을 조합해 더 큰 계산을 만드는 과정 보기","kind":"ADD","a":4,"b":3,"desc":"작은 연산을 조합합니다."}];
-const INS = {0:["NOP","0000"],1:["LDA","0001"],2:["LDB","0010"],3:["ADD","0011"],4:["SUB","0100"],5:["AND","0101"],6:["OR","0110"],7:["OUT","0111"],8:["MUL","1000"],9:["DIV","1001"],10:["CALC","1010"],15:["HLT","1111"]};
-const $ = (id) => document.getElementById(id);
-const B = (n) => (Number(n) & 15).toString(2).padStart(4, "0");
-const ALU_DIRECT = new Set(["ADD","SUB","MUL","DIV","AND","OR"]);
-let memory = [1,2,3,7,15,0,0,0,0,0,0,0,0,0,0,0];
-let cpu = { pc:0, ir:0, a:0, b:0, acc:0, out:0, input:3, phase:0, run:false, halt:false };
-let taskState = null;
-let timer = null;
-function insName(code) { return (INS[code] || INS[0])[0]; }
-function opCode(kind) { return { ADD:3, SUB:4, AND:5, OR:6, MUL:8, DIV:9 }[kind] || 10; }
-function pop4(n) { return B(n).split("").filter((x) => x === "1").length; }
-function calculate(task, a, b) {
-  a &= 15; b &= 15; let raw = 0; let note = "";
-  switch(task.kind) {
-    case "ADD": raw = a + b; break; case "SUB": raw = a - b; break; case "MUL": raw = a * b; break;
-    case "DIV": raw = b === 0 ? 0 : Math.floor(a / b); note = b === 0 ? "0으로 나누기는 0으로 처리합니다." : `나머지 ${a % b}`; break;
-    case "MOD": raw = b === 0 ? 0 : a % b; note = b === 0 ? "0으로 나누기는 0으로 처리합니다." : `몫 ${Math.floor(a / b)}`; break;
-    case "INC": raw = a + 1; break; case "DEC": raw = a - 1; break; case "DOUBLE": raw = a * 2; break; case "HALF": raw = Math.floor(a / 2); break;
-    case "SUM3": raw = a + b + 3; break; case "RUNSUM": { const lo = Math.min(a,b); const hi = Math.max(a,b); for(let x=lo;x<=hi;x++) raw += x; break; }
-    case "ABS": raw = Math.abs(a - b); break; case "BIGSUB": raw = Math.max(a,b) - Math.min(a,b); break; case "SMALLSUB": raw = Math.min(a,b) - Math.max(a,b); break;
-    case "ODD": raw = a & 1; break; case "MULT2": raw = a % 2 === 0 ? 1 : 0; break; case "MULT4": raw = a % 4 === 0 ? 1 : 0; break;
-    case "EQ": raw = a === b ? 1 : 0; break; case "GT": raw = a > b ? 1 : 0; break; case "LT": raw = a < b ? 1 : 0; break;
-    case "MAX": raw = Math.max(a,b); break; case "MIN": raw = Math.min(a,b); break; case "GE": raw = a >= b ? 1 : 0; break; case "RANGE": raw = a <= b ? 1 : 0; break;
-    case "LEDTRUE": raw = a >= b ? 15 : 0; break; case "LEDFALSE": raw = a >= b ? 0 : 15; break; case "PASS": raw = a; break;
-    case "HIGHLOW": raw = a >> 2; note = `상위 2비트=${a >> 2}, 하위 2비트=${a & 3}`; break; case "ONES": raw = a % 10; break;
-    case "CARRY": raw = a + b > 15 ? 1 : 0; break; case "BORROW": raw = a < b ? 1 : 0; break;
-    case "ROUND": { const u = Math.max(1,b); raw = Math.floor((a + Math.floor(u/2)) / u) * u; break; }
-    case "ROUND10": raw = Math.floor((a + 5) / 10); break; case "TENS": raw = a % 10; note = `10의 자리=${Math.floor(a/10)}`; break; case "COMPOSE": raw = 10 * a + b; break;
-    case "EVENNEXT": raw = (a + 2) & 14; break; case "ODDNEXT": raw = (a + 2) | 1; break; case "LEDSEQ": raw = 1 << (a % 4); break;
-    case "SHL": raw = a << 1; break; case "SHR": raw = a >> 1; break; case "AND": raw = a & b; break; case "OR": raw = a | b; break; case "XOR": raw = a ^ b; break; case "NOT": raw = (~a) & 15; break;
-    case "LOW2": raw = a & 3; break; case "HIGH2": raw = a & 12; break; case "BOTH": raw = (a & 3) === 3 ? 1 : 0; break; case "ANY": raw = (a & 3) !== 0 ? 1 : 0; break; case "ONE": raw = [1,2].includes(a & 3) ? 1 : 0; break;
-    case "POPC": raw = pop4(a); break; case "LV4": raw = Math.floor(a / 4); break; case "LV3": raw = a < 5 ? 0 : (a < 11 ? 1 : 2); break; case "RAND": raw = (a * 5 + 1) & 15; break; case "DICE": raw = (a % 6) + 1; break; case "MOD3": raw = a % 3; break;
-    default: raw = a + b;
-  }
-  if (!note && (raw > 15 || raw < 0)) note = "4비트 출력은 아래 4비트만 표시됩니다.";
-  return { raw, value: raw & 15, note };
-}
-function currentTask() { return TASKS[Number($("task").value) || 0]; }
-function programFor(task) { const code = opCode(task.kind); return [{addr:0,code:1,name:"LDA",meaning:"입력 A → 레지스터 A"},{addr:1,code:2,name:"LDB",meaning:"입력 B/기준값 → 레지스터 B"},{addr:2,code,name:insName(code),meaning:code===10?"선택 작업 계산 → ACC":`${insName(code)} → ACC`},{addr:3,code:7,name:"OUT",meaning:"ACC → OUT → LED"},{addr:4,code:15,name:"HLT",meaning:"정지"}]; }
-function fillTasks(){ TASKS.forEach((task,index)=>$("task").add(new Option(`${String(index+1).padStart(3,"0")}. ${task.title}`, String(index)))); $("task").value="0"; $("ain").value=TASKS[0].a; $("bin").value=TASKS[0].b; }
-function updateTaskInfo(message="") { const task=currentTask(); const a=Number($("ain").value||0)&15; const b=Number($("bin").value||0)&15; const result=calculate(task,a,b); $("sa").textContent=`${a} (${B(a)})`; $("sb").textContent=`${b} (${B(b)})`; $("se").textContent=`${result.value} (${B(result.value)})`; $("so").textContent=taskState&&taskState.actual!==null?`${taskState.actual} (${B(taskState.actual)})`:"아직 실행 전"; $("taskInfo").textContent=`${taskState?"준비됨":"아직 준비 전"}: ${task.title}. ${task.desc} 예상 출력은 ${result.value}(${B(result.value)})입니다. ${result.note} ${message}`; $("memset").innerHTML='<table><tr><th>주소</th><th>명령</th><th>4비트</th><th>의미</th></tr>'+programFor(task).map((row)=>`<tr><td>0x${row.addr.toString(16).toUpperCase()}</td><td>${row.name}</td><td>${B(row.code)}</td><td>${row.meaning}</td></tr>`).join("")+"</table>"; }
-function prepareTask(){ const task=currentTask(); let a=Number($("ain").value||0)&15; let b=Number($("bin").value||0)&15; if(["DIV","MOD"].includes(task.kind)&&b===0){b=1;$("bin").value="1";} memory=Array(16).fill(0); programFor(task).forEach((row)=>memory[row.addr]=row.code); taskState={task,a,b,loadedB:false,actual:null}; cpu={pc:0,ir:0,a:0,b:0,acc:0,out:0,input:a,phase:0,run:false,halt:false}; $("run").textContent="자동 실행"; log(`작업 준비: ${task.title}. A=${a}(${B(a)}), B=${b}(${B(b)})`); render(); updateTaskInfo("입력 A가 입력 포트에 있습니다."); }
-function setBits(prefix,value){ B(value).split("").forEach((ch,i)=>{const el=$(prefix+(3-i)); if(el) el.textContent=ch;}); }
-function microPanel(){ const ins=insName(cpu.ir); const next=insName(memory[cpu.pc]||0); const candidate=calculate(taskState?taskState.task:currentTask(),cpu.a,cpu.b).value; const cards=[["RAM",`PC=${B(cpu.pc)} 주소에서 다음 명령 ${next}(${B(memory[cpu.pc]||0)}) 준비`],["IR",`현재 명령 래치=${B(cpu.ir)} / opcode=${ins}`],["제어장치",`T${cpu.phase} 단계. 필요한 신호를 켭니다.`],["레지스터",`A=${B(cpu.a)}, B=${B(cpu.b)}, 입력 버스=${B(cpu.input)}`],["ALU",`op=${ins}, A=${B(cpu.a)}, B=${B(cpu.b)}, 결과 후보=${B(candidate)}`],["ACC/OUT",`ACC=${B(cpu.acc)}, OUT=${B(cpu.out)}. OUT 단계에서 LED로 복사`]]; $("micro").innerHTML=cards.map((card,index)=>`<div class="m ${index===cpu.phase||(card[0]==="ALU"&&cpu.phase===2)?"hot":""}"><h3>${card[0]}</h3><p>${card[1]}</p></div>`).join(""); }
-function render(){ setBits("pc",cpu.pc); setBits("ir",cpu.ir); setBits("a",cpu.a); setBits("b",cpu.b); setBits("acc",cpu.acc); setBits("out",cpu.out); $("regs").innerHTML=["pc","ir","a","b","acc","out","input"].map((key)=>`<div><span>${key.toUpperCase()}</span><b>${B(cpu[key])}</b></div>`).join(""); for(let i=0;i<4;i++){ $("led"+i).classList.toggle("on",Boolean(cpu.out&(1<<i))); $("in"+i).classList.toggle("on",Boolean(cpu.input&(1<<i))); } document.querySelectorAll(".phase").forEach((el,i)=>el.classList.toggle("on",i===cpu.phase)); document.querySelectorAll(".node").forEach((el)=>el.classList.remove("active")); [["pcN","ramN"],["irN","cuN"],["cuN","inputN","aN","bN","aluN"],["accN","outN","ledN","pcN"]][cpu.phase].forEach((id)=>$(id).classList.add("active")); const ins=INS[cpu.ir]||INS[0]; const next=INS[memory[cpu.pc]||0]||INS[0]; $("ib").textContent=`현재 명령: ${ins[1]} ${ins[0]}`; $("pcState").textContent=`주소=${B(cpu.pc)}`; $("ramState").textContent=`선택 주소: 0x${cpu.pc.toString(16).toUpperCase()}`; $("ramWord").textContent=`읽은 명령: ${next[0]} / ${next[1]}`; $("irState").textContent=`명령 래치: ${B(cpu.ir)}`; $("irDecode").textContent=`opcode = ${ins[0]}`; $("cuState").textContent=`신호: ${["MEM_READ","LOAD_IR","ALU/LOAD","WRITE/INC"][cpu.phase]}`; $("decText").textContent=`decoder: ${ins[0]}`; $("seqText").textContent=`T${cpu.phase}`; $("inState").textContent=`입력=${B(cpu.input)}`; $("aState").textContent=`저장값=${B(cpu.a)}`; $("bState").textContent=`저장값=${B(cpu.b)}`; $("aluOp").textContent=`op = ${ins[0]}`; $("aluArgs").textContent=`A=${B(cpu.a)}, B=${B(cpu.b)}`; $("aluRes").textContent=`결과=${B(calculate(taskState?taskState.task:currentTask(),cpu.a,cpu.b).value)}`; $("accState").textContent=`ALU 결과 래치=${B(cpu.acc)}`; $("outState").textContent=`출력 래치=${B(cpu.out)}`; $("explain").textContent=["PC의 주소가 RAM에 전달되고 RAM은 해당 주소의 명령을 준비합니다.","RAM에서 읽은 4비트 명령이 IR에 저장되고 제어장치가 opcode를 해석합니다.","제어장치가 레지스터 저장 또는 ALU 연산 신호를 켭니다.","ACC와 OUT이 값을 저장하고 PC가 다음 주소로 증가합니다."][cpu.phase]; microPanel(); updateTaskInfo(); }
-function log(text){ const li=document.createElement("li"); li.textContent=text; $("log").prepend(li); while($("log").children.length>15) $("log").lastChild.remove(); }
-function pathPoint(path,t){ const length=path.getTotalLength(); return path.getPointAtLength(length*t); }
-function movePacket(pathId,label,kind="data"){ const path=$(pathId); if(!path) return Promise.resolve(); const g=document.createElementNS("http://www.w3.org/2000/svg","g"); const c=document.createElementNS("http://www.w3.org/2000/svg","circle"); const tx=document.createElementNS("http://www.w3.org/2000/svg","text"); g.classList.add("packet"); c.setAttribute("r","10"); c.setAttribute("fill",kind==="addr"?"#1e5bff":kind==="ctrl"?"#ff7a00":"#11883a"); tx.textContent=String(label).slice(0,4); g.append(c,tx); $("packets").append(g); const duration=Math.max(240,820/Number($("speed").value)); const start=performance.now(); return new Promise((resolve)=>{ function frame(now){ const p=Math.min(1,(now-start)/duration); const point=pathPoint(path,p); g.setAttribute("transform",`translate(${point.x} ${point.y})`); if(p<1) requestAnimationFrame(frame); else {g.remove(); resolve();} } requestAnimationFrame(frame); }); }
-async function animatePhase(){ const ins=insName(cpu.ir); if(cpu.phase===0){ await movePacket("pAddr",B(cpu.pc),"addr"); await movePacket("pRamIr",B(memory[cpu.pc]||0),"data"); } else if(cpu.phase===1){ await movePacket("pIrCu",ins,"ctrl"); } else if(cpu.phase===2){ if(ins==="LDA") await movePacket("pInA",B(cpu.input),"data"); else if(ins==="LDB") await movePacket("pInB",B(cpu.input),"data"); else { await movePacket("pAAlu",B(cpu.a),"data"); await movePacket("pBAlu",B(cpu.b),"data"); await movePacket("pCuAlu",ins,"ctrl"); } } else if(cpu.phase===3){ if(ins==="OUT"){ await movePacket("pAccOut",B(cpu.acc),"data"); await movePacket("pOutLed",B(cpu.acc),"data"); } else { await movePacket("pAluAcc",B(cpu.acc),"data"); } } }
-async function stepOnce(){ if(cpu.halt){ log("정지 상태입니다. 리셋 후 다시 실행하십시오."); return; } render(); await animatePhase(); const ins=insName(cpu.ir); if(cpu.phase===0){ cpu.ir=memory[cpu.pc]||0; log(`FETCH: PC=${B(cpu.pc)} 주소의 RAM 명령 ${insName(cpu.ir)}(${B(cpu.ir)}) 읽기`); cpu.phase=1; } else if(cpu.phase===1){ log(`DECODE: IR=${B(cpu.ir)} → 제어장치가 ${insName(cpu.ir)} 신호 생성`); cpu.phase=2; } else if(cpu.phase===2){ if(ins==="LDA"){ cpu.a=cpu.input; log(`EXECUTE: 입력 ${B(cpu.input)} → 레지스터 A`); } else if(ins==="LDB"){ cpu.b=cpu.input; log(`EXECUTE: 입력 ${B(cpu.input)} → 레지스터 B`); } else if(ins==="ADD") cpu.acc=(cpu.a+cpu.b)&15; else if(ins==="SUB") cpu.acc=(cpu.a-cpu.b)&15; else if(ins==="MUL") cpu.acc=(cpu.a*cpu.b)&15; else if(ins==="DIV") cpu.acc=cpu.b===0?0:Math.floor(cpu.a/cpu.b)&15; else if(ins==="AND") cpu.acc=cpu.a&cpu.b; else if(ins==="OR") cpu.acc=cpu.a|cpu.b; else if(ins==="CALC"){ const result=calculate(taskState?taskState.task:currentTask(),cpu.a,cpu.b); cpu.acc=result.value; log(`EXECUTE: ${taskState?taskState.task.title:currentTask().title} → ALU 결과 ${result.value}(${B(result.value)}) ${result.note}`); } if(ALU_DIRECT.has(ins)) log(`EXECUTE: ALU ${ins}, A=${B(cpu.a)}, B=${B(cpu.b)} → ACC=${B(cpu.acc)}`); cpu.phase=3; } else { if(ins==="OUT"){ cpu.out=cpu.acc; if(taskState) taskState.actual=cpu.out; log(`WRITE-BACK: ACC ${B(cpu.acc)} → OUT → LED`); } if(ins==="LDA"&&taskState&&!taskState.loadedB){ cpu.input=taskState.b; taskState.loadedB=true; log(`작업 진행: 입력 B ${taskState.b}(${B(taskState.b)})를 입력 포트에 둠`); } if(ins==="HLT"){ cpu.halt=true; cpu.run=false; $("run").textContent="자동 실행"; log("정지"); } else { cpu.pc=(cpu.pc+1)&15; } cpu.phase=0; } render(); }
-function runLoop(){ if(!cpu.run) return; stepOnce().then(()=>{ if(cpu.run&&!cpu.halt) timer=setTimeout(runLoop,Math.max(160,620/Number($("speed").value))); }); }
-function resetAll(){ cpu={pc:0,ir:0,a:0,b:0,acc:0,out:0,input:taskState?taskState.a:cpu.input,phase:0,run:false,halt:false}; if(taskState){taskState.actual=null; taskState.loadedB=false;} $("run").textContent="자동 실행"; render(); log("리셋"); }
-function initTooltips(){ const help={pcN:"PC: 다음에 읽을 명령어 주소를 저장합니다.",ramN:"RAM: PC가 가리키는 주소의 4비트 명령을 읽습니다.",irN:"IR: RAM에서 온 명령을 래치하고 opcode로 보관합니다.",cuN:"제어장치: IR을 해석해 각 부품의 신호를 켭니다.",inputN:"입력 포트: A와 B 값이 차례로 들어옵니다.",aN:"레지스터 A: 첫 번째 입력값을 저장합니다.",bN:"레지스터 B: 두 번째 입력값이나 기준값을 저장합니다.",aluN:"ALU: A와 B를 받아 계산 결과를 만듭니다.",accN:"ACC: ALU 결과를 임시 저장합니다.",outN:"OUT: 외부로 보낼 값을 저장합니다.",ledN:"LED: OUT의 4비트 값을 보여줍니다."}; const tip=$("tip"); document.querySelectorAll(".node").forEach((node)=>{ node.addEventListener("mouseenter",()=>{tip.textContent=help[node.id]||"";tip.hidden=false;}); node.addEventListener("mousemove",(ev)=>{tip.style.left=Math.min(innerWidth-330,ev.clientX+15)+"px";tip.style.top=Math.min(innerHeight-100,ev.clientY+15)+"px";}); node.addEventListener("mouseleave",()=>{tip.hidden=true;}); }); }
-fillTasks(); updateTaskInfo(); initTooltips(); render();
-$("prep").addEventListener("click",prepareTask);
-$("step").addEventListener("click",()=>{cpu.run=false; $("run").textContent="자동 실행"; stepOnce();});
-$("run").addEventListener("click",()=>{ if(cpu.halt) return; cpu.run=!cpu.run; $("run").textContent=cpu.run?"일시정지":"자동 실행"; if(cpu.run) runLoop(); });
-$("reset").addEventListener("click",resetAll);
-$("basic").addEventListener("click",()=>{$("task").value="0"; $("ain").value=TASKS[0].a; $("bin").value=TASKS[0].b; prepareTask();});
-$("task").addEventListener("change",()=>{ const t=currentTask(); $("ain").value=t.a; $("bin").value=t.b; taskState=null; updateTaskInfo(); render(); });
-$("ain").addEventListener("input",updateTaskInfo); $("bin").addEventListener("input",updateTaskInfo);
-log("준비 완료: 작업을 고르고 이 작업 준비를 누르십시오.");
-</script>
+<script src="app.js"></script>
 </body>
 </html>
