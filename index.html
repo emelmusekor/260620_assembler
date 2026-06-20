@@ -75,6 +75,35 @@
 </div>
 </section>
 <section class="card">
+<h2>Data movement frame</h2>
+<div class="moveFrame">
+<svg class="moveSvg" viewBox="0 0 1000 360">
+<defs><marker id="mArrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,3.5 L0,7Z" fill="#2563eb"/></marker></defs>
+<g class="flowNode" id="fn_pc"><rect x="35" y="35" width="120" height="62" rx="10"/><text x="95" y="72" text-anchor="middle">PC</text></g>
+<g class="flowNode" id="fn_ram"><rect x="245" y="35" width="140" height="62" rx="10"/><text x="315" y="72" text-anchor="middle">RAM</text></g>
+<g class="flowNode" id="fn_ir"><rect x="475" y="35" width="120" height="62" rx="10"/><text x="535" y="72" text-anchor="middle">IR</text></g>
+<g class="flowNode" id="fn_ctrl"><rect x="715" y="35" width="155" height="62" rx="10"/><text x="792" y="72" text-anchor="middle">Control</text></g>
+<g class="flowNode" id="fn_input"><rect x="35" y="225" width="145" height="62" rx="10"/><text x="108" y="262" text-anchor="middle">Input bus</text></g>
+<g class="flowNode" id="fn_reg"><rect x="270" y="225" width="165" height="62" rx="10"/><text x="352" y="262" text-anchor="middle">A/B registers</text></g>
+<g class="flowNode" id="fn_alu"><rect x="545" y="225" width="135" height="62" rx="10"/><text x="612" y="262" text-anchor="middle">ALU</text></g>
+<g class="flowNode" id="fn_acc"><rect x="755" y="225" width="115" height="62" rx="10"/><text x="812" y="262" text-anchor="middle">ACC</text></g>
+<g class="flowNode" id="fn_out"><rect x="755" y="305" width="115" height="46" rx="10"/><text x="812" y="334" text-anchor="middle">OUT</text></g>
+<g class="flowNode" id="fn_led"><rect x="910" y="305" width="75" height="46" rx="10"/><text x="947" y="334" text-anchor="middle">LED</text></g>
+<path class="flowPath" id="flow_pc_ram" d="M155 66 H245" marker-end="url(#mArrow)"/>
+<path class="flowPath" id="flow_ram_ir" d="M385 66 H475" marker-end="url(#mArrow)"/>
+<path class="flowPath ctrl" id="flow_ir_ctrl" d="M595 66 H715" marker-end="url(#mArrow)"/>
+<path class="flowPath" id="flow_in_reg" d="M180 256 H270" marker-end="url(#mArrow)"/>
+<path class="flowPath" id="flow_reg_alu" d="M435 256 H545" marker-end="url(#mArrow)"/>
+<path class="flowPath ctrl" id="flow_ctrl_alu" d="M792 97 V155 H612 V225" marker-end="url(#mArrow)"/>
+<path class="flowPath" id="flow_alu_acc" d="M680 256 H755" marker-end="url(#mArrow)"/>
+<path class="flowPath" id="flow_acc_out" d="M812 287 V305" marker-end="url(#mArrow)"/>
+<path class="flowPath" id="flow_out_led" d="M870 328 H910" marker-end="url(#mArrow)"/>
+<g id="flowToken" style="display:none"><circle class="tokenBubble" r="18"/><text class="tokenText" id="flowTokenText">0000</text></g>
+</svg>
+</div>
+<div class="flowCaption" id="flowLabel"></div>
+</section>
+<section class="card">
 <h2>Register latch view</h2>
 <div class="detailgrid" id="regdetail"></div>
 </section>
@@ -89,5 +118,6 @@
 </section>
 </main>
 <script src="app.js"></script>
+<script src="flow.js"></script>
 </body>
 </html>
